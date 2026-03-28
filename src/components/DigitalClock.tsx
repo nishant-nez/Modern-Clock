@@ -30,6 +30,7 @@ export function DigitalClock() {
     const showSeconds = useSettingsStore((state) => state.showSeconds);
     const showDate = useSettingsStore((state) => state.showDate);
     const clockStyle = useSettingsStore((state) => state.clockStyle);
+    const theme = useSettingsStore((state) => state.theme);
 
     const { hourText, minuteText, secondText, suffix, dateText } = useMemo(() => {
         const hour24 = now.getHours();
@@ -54,7 +55,7 @@ export function DigitalClock() {
         clockStyle === "thin"
             ? "font-light tracking-[0.08em]"
             : clockStyle === "segmented"
-                ? "font-mono tracking-[0.12em] drop-shadow-[0_0_24px_rgba(255,255,255,0.20)]"
+                ? `font-mono tracking-[0.12em] ${theme === "light" ? "" : "drop-shadow-[0_0_24px_rgba(255,255,255,0.20)]"}`
                 : "font-semibold";
 
     return (

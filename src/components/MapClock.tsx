@@ -5,6 +5,7 @@ import type { FeatureCollection, Geometry } from "geojson";
 import { useEffect, useMemo, useState } from "react";
 import { useClock } from "@/hooks/useClock";
 import { getUtcOffsetLabel } from "@/lib/time";
+import { useSettingsStore } from "@/store/settingsStore";
 
 const COUNTRY_TIMEZONE: Record<string, { city: string; timeZone: string }> = {
     "United States of America": { city: "New York", timeZone: "America/New_York" },
@@ -52,7 +53,9 @@ export function MapClock() {
     const [geoData, setGeoData] = useState<FeatureCollection<Geometry> | null>(null);
     const [selectedCountry, setSelectedCountry] = useState("United States of America");
     const [hoverCountry, setHoverCountry] = useState<string | null>(null);
-    const [pointer, setPointer] = useState({ x: 0, y: 0 });
+    const [pointer, setPointer] = useState({ x: 0, y: 0, width: 0, height: 0 });
+    const theme = useSettingsStore((state) => state.theme);
+    const isLightTheme = theme === "light";
 
     useEffect(() => {
         const load = async () => {
@@ -141,10 +144,49 @@ export function MapClock() {
         }).format(now)
         : "";
 
+    const tooltipPosition = useMemo(() => {
+        const tooltipWidth = 288;
+        const tooltipHeight = 200;
+        const margin = 8;
+
+        let left = pointer.x + 50;
+        let top = pointer.y + 20;
+
+        if (left + tooltipWidth > pointer.width - margin) {
+            left = pointer.x - tooltipWidth - 10;
+        }
+
+        if (top + tooltipHeight > pointer.height - margin) {
+            top = pointer.y - tooltipHeight - 10;
+        }
+
+        if (left < margin) {
+            left = margin;
+        }
+
+        if (top < margin) {
+            top = margin;
+        }
+
+        return { left, top };
+    }, [pointer]);
+
     return (
         <section className="grid gap-8 lg:grid-cols-[1.25fr,1fr]">
-            <div className="relative rounded-3xl border border-white/10 bg-white/5 p-4 backdrop-blur md:p-6">
-                <svg viewBox="0 0 1000 520" className="h-full w-full rounded-2xl bg-zinc-950/70 p-2">
+            <div className={`relative rounded-3xl border p-4 backdrop-blur md:p-6 ${isLightTheme ? "border-black/20 bg-white/85" : "border-white/10 bg-white/5"}`}>
+                <svg
+                    viewBox="0 0 1000 520"
+                    className={`h-full w-full rounded-2xl p-2 ${isLightTheme ? "bg-slate-100" : "bg-zinc-950/70"}`}
+                    onMouseMove={(event) => {
+                        const rect = event.currentTarget.getBoundingClientRect();
+                        setPointer({
+                            x: event.clientX - rect.left,
+                            y: event.clientY - rect.top,
+                            width: rect.width,
+                            height: rect.height,
+                        });
+                    }}
+                >
                     <rect x="0" y="0" width="1000" height="520" fill="rgba(255,255,255,0.01)" />
                     {mappedPaths.map((country) => {
                         const active = selected.country === country.name;
@@ -152,13 +194,12 @@ export function MapClock() {
                             <path
                                 key={country.name}
                                 d={country.d}
-                                fill={active ? "rgba(34,211,238,0.65)" : "rgba(255,255,255,0.12)"}
-                                stroke="rgba(255,255,255,0.26)"
+                                fill={active ? "rgba(34,211,238,0.65)" : isLightTheme ? "rgba(15,23,42,0.12)" : "rgba(255,255,255,0.12)"}
+                                stroke={isLightTheme ? "rgba(15,23,42,0.35)" : "rgba(255,255,255,0.26)"}
                                 strokeWidth={active ? 1.1 : 0.45}
-                                className="cursor-pointer transition-colors hover:fill-cyan-400/60"
+                                className={`cursor-pointer transition-colors ${isLightTheme ? "hover:fill-sky-400/60" : "hover:fill-cyan-400/60"}`}
                                 onClick={() => setSelectedCountry(country.name)}
                                 onMouseEnter={() => setHoverCountry(country.name)}
-                                onMouseMove={(event) => setPointer({ x: event.clientX, y: event.clientY })}
                                 onMouseLeave={() => setHoverCountry(null)}
                             />
                         );
@@ -167,8 +208,8 @@ export function MapClock() {
 
                 {hovered ? (
                     <div
-                        className="pointer-events-none fixed z-50 w-72 rounded-2xl border border-cyan-300/35 bg-zinc-950/95 p-4 shadow-[0_10px_45px_rgba(0,0,0,0.55)] backdrop-blur"
-                        style={{ left: pointer.x + 6, top: pointer.y + 6 }}
+                        className={`pointer-events-none absolute z-20 w-72 rounded-2xl border p-4 shadow-[0_10px_45px_rgba(0,0,0,0.35)] backdrop-blur ${isLightTheme ? "border-slate-300 bg-white/95 text-slate-900" : "border-cyan-300/35 bg-zinc-950/95 text-zinc-100"}`}
+                        style={tooltipPosition}
                     >
                         <p className="text-xs uppercase tracking-[0.22em] opacity-70">Hover Preview</p>
                         <h3 className="mt-2 text-xl font-semibold">{hovered.city}</h3>
@@ -181,7 +222,7 @@ export function MapClock() {
                 ) : null}
             </div>
 
-            <aside className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur">
+            <aside className={`rounded-3xl border p-6 backdrop-blur ${isLightTheme ? "border-black/20 bg-white/85" : "border-white/10 bg-white/5"}`}>
                 <p className="text-xs uppercase tracking-[0.22em] opacity-70">Selected Location</p>
                 <h3 className="mt-3 text-2xl font-semibold">{selected.city}</h3>
                 <p className="opacity-70">{selected.country}</p>

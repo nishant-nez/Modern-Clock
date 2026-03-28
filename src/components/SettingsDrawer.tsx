@@ -15,7 +15,7 @@ interface SettingsDrawerProps {
     onClose: () => void;
 }
 
-const THEMES: ThemeMode[] = ["dark", "neon", "grayscale", "gradient", "glass"];
+const THEMES: ThemeMode[] = ["dark", "light", "neon", "grayscale", "gradient", "glass"];
 const CLOCK_STYLES: ClockStyle[] = ["classic", "split", "segmented", "thin", "analog", "flip"];
 const TIME_FORMATS: TimeFormat[] = ["12h", "24h"];
 const DIAL_STYLES: AnalogDialStyle[] = ["classic", "modern", "minimal"];
@@ -23,12 +23,13 @@ const ACCENTS: AnalogAccent[] = ["dark", "light", "color"];
 
 export function SettingsDrawer({ open, onClose }: SettingsDrawerProps) {
     const settings = useSettingsStore();
+    const isLightTheme = settings.theme === "light";
 
     const panelClass = useMemo(
         () =>
-            `fixed right-0 top-0 z-40 h-full w-full max-w-sm transform border-l border-white/10 bg-black/85 p-6 backdrop-blur transition-transform duration-300 ${open ? "translate-x-0" : "translate-x-full"
-            }`,
-        [open]
+            `fixed right-0 top-0 z-40 h-full w-full max-w-sm transform border-l p-6 backdrop-blur transition-transform duration-300 ${isLightTheme ? "border-black/15 bg-white/95 text-slate-900" : "border-white/10 bg-black/85 text-white"
+            } ${open ? "translate-x-0" : "translate-x-full"}`,
+        [open, isLightTheme]
     );
 
     return (
@@ -37,7 +38,7 @@ export function SettingsDrawer({ open, onClose }: SettingsDrawerProps) {
             <aside className={panelClass} aria-hidden={!open}>
                 <div className="mb-6 flex items-center justify-between">
                     <h2 className="text-lg font-semibold tracking-wide">Settings</h2>
-                    <button onClick={onClose} className="rounded-lg border border-white/20 px-3 py-1">
+                    <button onClick={onClose} className={`rounded-lg border px-3 py-1 ${isLightTheme ? "border-black/20" : "border-white/20"}`}>
                         Close
                     </button>
                 </div>
@@ -50,7 +51,13 @@ export function SettingsDrawer({ open, onClose }: SettingsDrawerProps) {
                                 <button
                                     key={theme}
                                     onClick={() => settings.setTheme(theme)}
-                                    className={`rounded-xl border px-3 py-2 text-left capitalize ${settings.theme === theme ? "border-cyan-300 bg-cyan-300/15" : "border-white/15 bg-white/5"
+                                    className={`rounded-xl border px-3 py-2 text-left capitalize ${settings.theme === theme
+                                        ? isLightTheme
+                                            ? "border-sky-500 bg-sky-100"
+                                            : "border-cyan-300 bg-cyan-300/15"
+                                        : isLightTheme
+                                            ? "border-black/15 bg-white"
+                                            : "border-white/15 bg-white/5"
                                         }`}
                                 >
                                     {theme}
@@ -64,10 +71,14 @@ export function SettingsDrawer({ open, onClose }: SettingsDrawerProps) {
                         <select
                             value={settings.clockStyle}
                             onChange={(event) => settings.setClockStyle(event.target.value as ClockStyle)}
-                            className="w-full rounded-xl border border-white/15 bg-black/30 px-3 py-2 capitalize"
+                            className={`w-full rounded-xl border px-3 py-2 capitalize ${isLightTheme ? "border-black/20 bg-white text-slate-900" : "border-white/15 bg-black/30 text-white"}`}
                         >
                             {CLOCK_STYLES.map((style) => (
-                                <option key={style} value={style} className="bg-zinc-900 capitalize">
+                                <option
+                                    key={style}
+                                    value={style}
+                                    className={`capitalize ${isLightTheme ? "bg-white text-slate-900" : "bg-zinc-900 text-white"}`}
+                                >
                                     {style}
                                 </option>
                             ))}
@@ -81,7 +92,13 @@ export function SettingsDrawer({ open, onClose }: SettingsDrawerProps) {
                                 <button
                                     key={format}
                                     onClick={() => settings.setTimeFormat(format)}
-                                    className={`rounded-xl border px-3 py-2 ${settings.timeFormat === format ? "border-cyan-300 bg-cyan-300/15" : "border-white/15 bg-white/5"
+                                    className={`rounded-xl border px-3 py-2 ${settings.timeFormat === format
+                                        ? isLightTheme
+                                            ? "border-sky-500 bg-sky-100"
+                                            : "border-cyan-300 bg-cyan-300/15"
+                                        : isLightTheme
+                                            ? "border-black/15 bg-white"
+                                            : "border-white/15 bg-white/5"
                                         }`}
                                 >
                                     {format}
@@ -111,10 +128,14 @@ export function SettingsDrawer({ open, onClose }: SettingsDrawerProps) {
                             <select
                                 value={settings.analogDialStyle}
                                 onChange={(event) => settings.setAnalogDialStyle(event.target.value as AnalogDialStyle)}
-                                className="w-full rounded-xl border border-white/15 bg-black/30 px-3 py-2 capitalize"
+                                className={`w-full rounded-xl border px-3 py-2 capitalize ${isLightTheme ? "border-black/20 bg-white text-slate-900" : "border-white/15 bg-black/30 text-white"}`}
                             >
                                 {DIAL_STYLES.map((style) => (
-                                    <option key={style} value={style} className="bg-zinc-900 capitalize">
+                                    <option
+                                        key={style}
+                                        value={style}
+                                        className={`capitalize ${isLightTheme ? "bg-white text-slate-900" : "bg-zinc-900 text-white"}`}
+                                    >
                                         {style}
                                     </option>
                                 ))}
@@ -125,7 +146,13 @@ export function SettingsDrawer({ open, onClose }: SettingsDrawerProps) {
                                     <button
                                         key={accent}
                                         onClick={() => settings.setAnalogAccent(accent)}
-                                        className={`rounded-lg border px-2 py-2 text-xs uppercase tracking-wide ${settings.analogAccent === accent ? "border-cyan-300 bg-cyan-300/15" : "border-white/15 bg-white/5"}`}
+                                        className={`rounded-lg border px-2 py-2 text-xs uppercase tracking-wide ${settings.analogAccent === accent
+                                            ? isLightTheme
+                                                ? "border-sky-500 bg-sky-100"
+                                                : "border-cyan-300 bg-cyan-300/15"
+                                            : isLightTheme
+                                                ? "border-black/15 bg-white"
+                                                : "border-white/15 bg-white/5"}`}
                                     >
                                         {accent}
                                     </button>
@@ -145,6 +172,18 @@ export function SettingsDrawer({ open, onClose }: SettingsDrawerProps) {
                             </div>
                         </section>
                     ) : null}
+
+                    <section className={`rounded-2xl border p-4 ${isLightTheme ? "border-black/15 bg-white" : "border-white/10 bg-black/20"}`}>
+                        <h3 className="text-sm uppercase tracking-[0.18em] opacity-75">Quick Tips</h3>
+                        <p className="mt-2 text-sm leading-6 opacity-80">
+                            Use this drawer to customize theme, clock style, time format, and visibility settings.
+                        </p>
+                        <ul className="mt-3 space-y-2 text-sm opacity-80">
+                            <li>• Keyboard shortcuts: T → Timer, S → Stopwatch, W → World.</li>
+                            <li>• Use fullscreen button in top-right for distraction-free mode.</li>
+                            <li>• Analog options appear only when Analog style is selected.</li>
+                        </ul>
+                    </section>
                 </div>
             </aside>
         </>

@@ -23,6 +23,13 @@
   --accent: #22d3ee;
 }
 
+:root[data-theme="light"] {
+  --background: #fffdf7;
+  --foreground: #0f172a;
+  --surface: rgba(15, 23, 42, 0.04);
+  --accent: #0ea5e9;
+}
+
 :root[data-theme="neon"] {
   --background: #020617;
   --foreground: #e2e8f0;
@@ -67,6 +74,14 @@ body {
   text-shadow: 0 0 24px color-mix(in oklab, var(--accent) 30%, transparent);
 }
 
+:root[data-theme="light"] .clock-display {
+  text-shadow: none;
+}
+
+:root[data-theme="light"] .app-theme {
+  background: linear-gradient(180deg, #fffdf7 0%, #fff9ec 100%);
+}
+
 .colon-blink {
   animation: colonBlink 1s steps(1, end) infinite;
 }
@@ -86,14 +101,18 @@ body {
   backface-visibility: hidden;
   transform-style: preserve-3d;
   will-change: transform;
-  animation: flipTop 0.34s ease-in forwards;
+  animation: flipTop 0.24s cubic-bezier(0.4, 0, 1, 1) forwards;
 }
 
 .flip-bottom {
   backface-visibility: hidden;
   transform-style: preserve-3d;
   will-change: transform;
-  animation: flipBottom 0.34s ease-out forwards;
+  animation: flipBottom 0.24s cubic-bezier(0, 0, 0.2, 1) 0.24s forwards;
+}
+
+.flip-card {
+  perspective: 1100px;
 }
 
 @keyframes flipTop {
@@ -126,4 +145,32 @@ body {
 
 .settings-toggle:hover {
   background: rgba(255, 255, 255, 0.12);
+}
+
+:root[data-theme="light"] .settings-toggle {
+  border-color: rgba(15, 23, 42, 0.16);
+  background: rgba(255, 255, 255, 0.9);
+}
+
+:root[data-theme="light"] .settings-toggle:hover {
+  background: rgba(226, 232, 240, 0.8);
+}
+
+:root[data-theme="light"] select {
+  color: #0f172a;
+  background-color: #ffffff;
+}
+
+:root[data-theme="light"] select option {
+  color: #0f172a;
+  background-color: #ffffff;
+}
+
+:root[data-theme="dark"] select option,
+:root[data-theme="neon"] select option,
+:root[data-theme="grayscale"] select option,
+:root[data-theme="gradient"] select option,
+:root[data-theme="glass"] select option {
+  color: #f8fafc;
+  background-color: #18181b;
 }

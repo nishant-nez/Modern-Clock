@@ -17,10 +17,9 @@ const NAV_ITEMS = [
     { href: "/world", label: "World" },
     { href: "/timer", label: "Timer" },
     { href: "/stopwatch", label: "Stopwatch" },
-    { href: "/settings", label: "Settings" },
 ];
 
-const THEME_SEQUENCE: ThemeMode[] = ["dark", "neon", "grayscale", "gradient", "glass"];
+const THEME_SEQUENCE: ThemeMode[] = ["dark", "light", "neon", "grayscale", "gradient", "glass"];
 
 function TimeFormatIcon() {
     return (
@@ -33,15 +32,17 @@ function TimeFormatIcon() {
 
 function ThemeIcon({ theme }: { theme: ThemeMode }) {
     const color =
-        theme === "neon"
-            ? "#22d3ee"
-            : theme === "grayscale"
-                ? "#d4d4d8"
-                : theme === "gradient"
-                    ? "#38bdf8"
-                    : theme === "glass"
-                        ? "#5eead4"
-                        : "#ffffff";
+        theme === "light"
+            ? "#0f172a"
+            : theme === "neon"
+                ? "#22d3ee"
+                : theme === "grayscale"
+                    ? "#d4d4d8"
+                    : theme === "gradient"
+                        ? "#38bdf8"
+                        : theme === "glass"
+                            ? "#5eead4"
+                            : "#ffffff";
 
     return (
         <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" aria-hidden="true">
@@ -88,6 +89,7 @@ export function AppShell({ children }: AppShellProps) {
     const setTheme = useSettingsStore((state) => state.setTheme);
     const timeFormat = useSettingsStore((state) => state.timeFormat);
     const setTimeFormat = useSettingsStore((state) => state.setTimeFormat);
+    const isLightTheme = theme === "light";
 
     useEffect(() => {
         const onKeyDown = (event: KeyboardEvent) => {
@@ -154,7 +156,7 @@ export function AppShell({ children }: AppShellProps) {
             <ServiceWorkerRegistration />
             <div className="app-theme min-h-screen">
                 {!isFullscreen ? (
-                    <header className="fixed left-0 right-0 top-0 z-20 border-b border-white/10 bg-black/40 backdrop-blur">
+                    <header className={`fixed left-0 right-0 top-0 z-20 border-b backdrop-blur ${isLightTheme ? "border-black/20 bg-white/85" : "border-white/10 bg-black/25"}`}>
                         <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-4 py-3 md:px-6">
                             <Link href="/clock" className="text-sm font-semibold tracking-[0.2em] uppercase">
                                 Clock App
@@ -176,12 +178,16 @@ export function AppShell({ children }: AppShellProps) {
                             </nav>
 
                             <div className="flex items-center gap-2">
-                                <div className="flex items-center rounded-full border border-white/20 bg-black/25 p-1">
+                                <div className={`flex items-center rounded-full border p-1 ${isLightTheme ? "border-black/15 bg-white/85" : "border-white/20 bg-black/25"}`}>
                                     <button
                                         onClick={() => setTimeFormat("12h")}
                                         title="Use 12-hour format"
                                         aria-label="Use 12-hour format"
-                                        className={`rounded-full px-2.5 py-1 text-xs font-medium tracking-wide transition ${timeFormat === "12h" ? "bg-white text-black" : "text-white/80 hover:bg-white/10"}`}
+                                        className={`rounded-full px-2.5 py-1 text-xs font-medium tracking-wide transition ${timeFormat === "12h"
+                                            ? "bg-white text-black"
+                                            : isLightTheme
+                                                ? "text-slate-700 hover:bg-slate-200"
+                                                : "text-white/80 hover:bg-white/10"}`}
                                     >
                                         12h
                                     </button>
@@ -189,7 +195,11 @@ export function AppShell({ children }: AppShellProps) {
                                         onClick={() => setTimeFormat("24h")}
                                         title="Use 24-hour format"
                                         aria-label="Use 24-hour format"
-                                        className={`rounded-full px-2.5 py-1 text-xs font-medium tracking-wide transition ${timeFormat === "24h" ? "bg-white text-black" : "text-white/80 hover:bg-white/10"}`}
+                                        className={`rounded-full px-2.5 py-1 text-xs font-medium tracking-wide transition ${timeFormat === "24h"
+                                            ? "bg-white text-black"
+                                            : isLightTheme
+                                                ? "text-slate-700 hover:bg-slate-200"
+                                                : "text-white/80 hover:bg-white/10"}`}
                                     >
                                         24h
                                     </button>
@@ -197,7 +207,7 @@ export function AppShell({ children }: AppShellProps) {
                                         onClick={onToggleTimeFormat}
                                         title="Toggle time format"
                                         aria-label="Toggle time format"
-                                        className="ml-1 rounded-full border border-white/15 p-1.5 hover:bg-white/10"
+                                        className={`ml-1 rounded-full border p-1.5 ${isLightTheme ? "border-black/15 hover:bg-slate-200" : "border-white/15 hover:bg-white/10"}`}
                                     >
                                         <TimeFormatIcon />
                                     </button>
@@ -206,7 +216,7 @@ export function AppShell({ children }: AppShellProps) {
                                     onClick={onToggleTheme}
                                     title={`Switch theme (current: ${theme})`}
                                     aria-label={`Switch theme (current: ${theme})`}
-                                    className="inline-flex items-center gap-2 rounded-full border border-white/20 px-3 py-2 text-xs uppercase tracking-[0.12em] hover:bg-white/10"
+                                    className={`inline-flex items-center gap-2 rounded-full border px-3 py-2 text-xs uppercase tracking-[0.12em] ${isLightTheme ? "border-black/15 hover:bg-slate-200" : "border-white/20 hover:bg-white/10"}`}
                                 >
                                     <ThemeIcon theme={theme} />
                                     <span className="hidden lg:inline">{theme}</span>
@@ -215,7 +225,7 @@ export function AppShell({ children }: AppShellProps) {
                                     onClick={onFullscreen}
                                     title={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
                                     aria-label={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
-                                    className="rounded-full border border-white/20 p-2.5 hover:bg-white/10"
+                                    className={`rounded-full border p-2.5 ${isLightTheme ? "border-black/15 hover:bg-slate-200" : "border-white/20 hover:bg-white/10"}`}
                                 >
                                     <FullscreenIcon active={isFullscreen} />
                                 </button>
@@ -223,7 +233,7 @@ export function AppShell({ children }: AppShellProps) {
                                     onClick={() => setOpen(true)}
                                     title="Open settings"
                                     aria-label="Open settings"
-                                    className="rounded-full border border-white/20 p-2.5 hover:bg-white/10"
+                                    className={`rounded-full border p-2.5 ${isLightTheme ? "border-black/15 hover:bg-slate-200" : "border-white/20 hover:bg-white/10"}`}
                                 >
                                     <SettingsIcon />
                                 </button>

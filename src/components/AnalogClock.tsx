@@ -6,11 +6,13 @@ import { useSettingsStore } from "@/store/settingsStore";
 
 export function AnalogClock() {
     const { now } = useClock({ smooth: true });
+    const theme = useSettingsStore((state) => state.theme);
     const analogDialStyle = useSettingsStore((state) => state.analogDialStyle);
     const analogRoman = useSettingsStore((state) => state.analogRoman);
     const analogTicks = useSettingsStore((state) => state.analogTicks);
     const analogShowSecond = useSettingsStore((state) => state.analogShowSecond);
     const analogAccent = useSettingsStore((state) => state.analogAccent);
+    const isLightTheme = theme === "light";
 
     const second = now.getSeconds() + now.getMilliseconds() / 1000;
     const minute = now.getMinutes() + second / 60;
@@ -28,8 +30,11 @@ export function AnalogClock() {
         [analogRoman]
     );
 
-    const accentClass =
-        analogAccent === "light"
+    const accentClass = isLightTheme
+        ? analogAccent === "color"
+            ? "text-sky-700"
+            : "text-slate-900"
+        : analogAccent === "light"
             ? "text-zinc-900"
             : analogAccent === "color"
                 ? "text-cyan-300"
@@ -39,17 +44,23 @@ export function AnalogClock() {
         <section className="flex flex-col items-center gap-8">
             <div
                 className={`relative grid h-[min(74vw,32rem)] w-[min(74vw,32rem)] place-items-center rounded-full border ${analogDialStyle === "minimal"
-                    ? "border-white/20 bg-transparent"
+                    ? isLightTheme
+                        ? "border-slate-400/50 bg-white/65"
+                        : "border-white/20 bg-transparent"
                     : analogDialStyle === "classic"
-                        ? "border-white/30 bg-zinc-950/55 shadow-[0_0_45px_rgba(0,0,0,0.65)]"
-                        : "border-white/20 bg-white/5 backdrop-blur"
+                        ? isLightTheme
+                            ? "border-slate-400/60 bg-white shadow-[0_0_35px_rgba(15,23,42,0.16)]"
+                            : "border-white/30 bg-zinc-950/55 shadow-[0_0_45px_rgba(0,0,0,0.65)]"
+                        : isLightTheme
+                            ? "border-slate-400/45 bg-white/80 backdrop-blur"
+                            : "border-white/20 bg-white/5 backdrop-blur"
                     } ${accentClass}`}
             >
                 <svg viewBox="0 0 100 100" className="h-full w-full">
                     {analogTicks
                         ? Array.from({ length: 60 }).map((_, index) => {
                             const angle = (index / 60) * Math.PI * 2;
-                            const inner = index % 5 === 0 ? 10 : 6;
+                            const inner = index % 5 === 0 ? 7 : 5;
                             const outerRadius = 40;
                             const x1 = 50 + Math.cos(angle) * (outerRadius - inner);
                             const y1 = 50 + Math.sin(angle) * (outerRadius - inner);

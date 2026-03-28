@@ -1,75 +1,83 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 const toMs = (h: number, m: number, s: number) => (h * 3600 + m * 60 + s) * 1000;
 
+let sharedDurationMs = 5 * 60 * 1000;
+let sharedElapsedBeforePauseMs = 0;
+let sharedRunningSinceEpoch: number | null = null;
+
+const computeRemaining = (nowEpoch = Date.now()) => {
+  const liveElapsed = sharedRunningSinceEpoch ? nowEpoch - sharedRunningSinceEpoch : 0;
+  const elapsed = sharedElapsedBeforePauseMs + liveElapsed;
+  return Math.max(sharedDurationMs - elapsed, 0);
+};
+
 export function useTimer(initialMs = 5 * 60 * 1000) {
-  const [durationMs, setDurationMs] = useState(initialMs);
-  const [remainingMs, setRemainingMs] = useState(initialMs);
-  const [isRunning, setIsRunning] = useState(false);
-  const startedAtRef = useRef<number | null>(null);
-  const offsetRef = useRef(0);
+  if (sharedDurationMs === 5 * 60 * 1000 && sharedElapsedBeforePauseMs === 0 && sharedRunningSinceEpoch === null) {
+    sharedDurationMs = initialMs;
+  }
+
+  const [durationMs, setDurationMs] = useState(sharedDurationMs);
+  const [remainingMs, setRemainingMs] = useState(computeRemaining());
+  const [isRunning, setIsRunning] = useState(Boolean(sharedRunningSinceEpoch));
 
   useEffect(() => {
-    if (!isRunning) {
+    const tick = () => {
+      const next = computeRemaining();
+      if (next === 0 && sharedRunningSinceEpoch) {
+        sharedElapsedBeforePauseMs = sharedDurationMs;
+        sharedRunningSinceEpoch = null;
+      }
+
+      setDurationMs(sharedDurationMs);
+      setRemainingMs(next);
+      setIsRunning(Boolean(sharedRunningSinceEpoch));
+    };
+
+    tick();
+    const id = window.setInterval(tick, 100);
+    return () => window.clearInterval(id);
+  }, []);
+
+  const start = useCallback(() => {
+    if (computeRemaining() <= 0) {
       return;
     }
 
-    let frameId = 0;
-    const loop = () => {
-      if (startedAtRef.current === null) {
-        return;
-      }
-
-      const elapsed = performance.now() - startedAtRef.current + offsetRef.current;
-      const next = Math.max(durationMs - elapsed, 0);
-      setRemainingMs(next);
-
-      if (next === 0) {
-        setIsRunning(false);
-        offsetRef.current = durationMs;
-        return;
-      }
-
-      frameId = requestAnimationFrame(loop);
-    };
-
-    frameId = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(frameId);
-  }, [durationMs, isRunning]);
-
-  const start = useCallback(() => {
-    if (remainingMs <= 0) {
-      return;
+    if (!sharedRunningSinceEpoch) {
+      sharedRunningSinceEpoch = Date.now();
     }
 
     setIsRunning(true);
-    startedAtRef.current = performance.now();
-  }, [remainingMs]);
+  }, []);
 
   const pause = useCallback(() => {
-    if (!isRunning || startedAtRef.current === null) {
+    if (!sharedRunningSinceEpoch) {
       return;
     }
 
-    offsetRef.current += performance.now() - startedAtRef.current;
-    startedAtRef.current = null;
+    sharedElapsedBeforePauseMs += Date.now() - sharedRunningSinceEpoch;
+    sharedRunningSinceEpoch = null;
+    setRemainingMs(computeRemaining());
     setIsRunning(false);
-  }, [isRunning]);
+  }, []);
 
   const reset = useCallback(() => {
-    startedAtRef.current = null;
-    offsetRef.current = 0;
-    setRemainingMs(durationMs);
+    sharedRunningSinceEpoch = null;
+    sharedElapsedBeforePauseMs = 0;
+    setDurationMs(sharedDurationMs);
+    setRemainingMs(sharedDurationMs);
     setIsRunning(false);
-  }, [durationMs]);
+  }, []);
 
   const setFromHms = useCallback((hours: number, minutes: number, seconds: number) => {
     const next = toMs(hours, minutes, seconds);
-    startedAtRef.current = null;
-    offsetRef.current = 0;
-    setDurationMs(next);
+    sharedDurationMs = next;
+    sharedElapsedBeforePauseMs = 0;
+    sharedRunningSinceEpoch = null;
+    setDurationMs(sharedDurationMs);
     setRemainingMs(next);
     setIsRunning(false);
   }, []);

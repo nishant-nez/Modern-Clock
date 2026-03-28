@@ -3,6 +3,7 @@
 import dynamic from "next/dynamic";
 import { useEffect, useMemo, useState } from "react";
 import { CITY_OPTIONS } from "@/lib/timezones";
+import { useSettingsStore } from "@/store/settingsStore";
 
 const MapClock = dynamic(() => import("@/components/MapClock").then((mod) => mod.MapClock), {
     ssr: false,
@@ -33,6 +34,8 @@ function RemoveIcon() {
 
 function CityCard({ city, onRemove }: { city: SelectedCity; onRemove: () => void }) {
     const [now, setNow] = useState(new Date());
+    const theme = useSettingsStore((state) => state.theme);
+    const isLightTheme = theme === "light";
 
     useEffect(() => {
         const tick = () => setNow(new Date());
@@ -58,14 +61,14 @@ function CityCard({ city, onRemove }: { city: SelectedCity; onRemove: () => void
         .find((part) => part.type === "timeZoneName")?.value;
 
     return (
-        <li className="rounded-2xl border border-white/10 bg-white/5 p-4">
+        <li className={`rounded-2xl border p-4 ${isLightTheme ? "border-black/20 bg-white/85" : "border-white/10 bg-white/5"}`}>
             <div className="flex items-start justify-between">
                 <div>
                     <h3 className="text-xl font-medium">{city.city}</h3>
                     <p className="opacity-70">{city.country}</p>
                     <p className="mt-1 text-xs opacity-60">{city.timeZone}</p>
                 </div>
-                <button onClick={onRemove} className="inline-flex items-center gap-1 rounded-lg border border-white/20 px-2 py-1 text-xs">
+                <button onClick={onRemove} className={`inline-flex items-center gap-1 rounded-lg border px-2 py-1 text-xs ${isLightTheme ? "border-black/20" : "border-white/20"}`}>
                     <RemoveIcon /> Remove
                 </button>
             </div>
@@ -78,6 +81,8 @@ function CityCard({ city, onRemove }: { city: SelectedCity; onRemove: () => void
 export function WorldClockPanel() {
     const [query, setQuery] = useState("");
     const [cities, setCities] = useState<SelectedCity[]>([CITY_OPTIONS[0]]);
+    const theme = useSettingsStore((state) => state.theme);
+    const isLightTheme = theme === "light";
 
     const filtered = useMemo(
         () =>
@@ -98,23 +103,23 @@ export function WorldClockPanel() {
 
     return (
         <section className="grid gap-8">
-            <div className="rounded-3xl border border-white/10 bg-white/5 p-5 backdrop-blur">
+            <div className={`rounded-3xl border p-5 backdrop-blur ${isLightTheme ? "border-black/20 bg-white/85" : "border-white/10 bg-white/5"}`}>
                 <div className="grid gap-3">
                     <input
                         value={query}
                         onChange={(event) => setQuery(event.target.value)}
                         placeholder="Search cities or timezone"
-                        className="rounded-xl border border-white/15 bg-black/20 px-4 py-3"
+                        className={`rounded-xl border px-4 py-3 ${isLightTheme ? "border-black/20 bg-white text-slate-900" : "border-white/15 bg-black/20"}`}
                     />
 
                     {query ? (
-                        <div className="grid gap-2 rounded-2xl border border-white/10 bg-black/20 p-3 md:grid-cols-2">
+                        <div className={`grid gap-2 rounded-2xl border p-3 md:grid-cols-2 ${isLightTheme ? "border-black/20 bg-white/90" : "border-white/10 bg-black/20"}`}>
                             {filtered.length ? (
                                 filtered.map((city) => (
                                     <button
                                         key={city.id}
                                         onClick={() => addCity(city)}
-                                        className="flex items-center justify-between rounded-xl border border-white/10 px-3 py-2 text-left hover:border-cyan-300/50 hover:bg-cyan-300/10"
+                                        className={`flex items-center justify-between rounded-xl border px-3 py-2 text-left ${isLightTheme ? "border-black/15 hover:border-sky-500/40 hover:bg-sky-100" : "border-white/10 hover:border-cyan-300/50 hover:bg-cyan-300/10"}`}
                                     >
                                         <span>
                                             <span className="block font-medium">{city.city}</span>

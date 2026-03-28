@@ -3,7 +3,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-export type ThemeMode = "dark" | "neon" | "grayscale" | "gradient" | "glass";
+export type ThemeMode = "dark" | "light" | "neon" | "grayscale" | "gradient" | "glass";
 export type ClockStyle = "classic" | "split" | "segmented" | "thin" | "analog" | "flip";
 export type TimeFormat = "12h" | "24h";
 export type AnalogDialStyle = "classic" | "modern" | "minimal";

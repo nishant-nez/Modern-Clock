@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useStopwatch } from "@/hooks/useStopwatch";
 import { pad } from "@/lib/time";
+import { useSettingsStore } from "@/store/settingsStore";
 
 function PlayIcon() {
     return (
@@ -45,9 +46,9 @@ function formatMs(ms: number) {
     return `${pad(minutes)}:${pad(seconds)}.${String(milliseconds).padStart(3, "0")}`;
 }
 
-function TimeCell({ value, label }: { value: string; label: string }) {
+function TimeCell({ value, label, light }: { value: string; label: string; light: boolean }) {
     return (
-        <div className="grid place-items-center gap-2 rounded-2xl border border-white/10 bg-black/20 px-4 py-4">
+        <div className={`grid place-items-center gap-2 rounded-2xl border px-4 py-4 ${light ? "border-black/20 bg-white" : "border-white/10 bg-black/20"}`}>
             <p className="text-5xl font-semibold tabular-nums md:text-6xl">{value}</p>
             <p className="text-xs uppercase tracking-[0.18em] opacity-70">{label}</p>
         </div>
@@ -56,6 +57,8 @@ function TimeCell({ value, label }: { value: string; label: string }) {
 
 export function Stopwatch() {
     const { elapsedMs, isRunning, laps, fastest, slowest, start, stop, reset, lap } = useStopwatch();
+    const theme = useSettingsStore((state) => state.theme);
+    const isLightTheme = theme === "light";
     const [isFullscreen, setIsFullscreen] = useState(false);
 
     useEffect(() => {
@@ -81,24 +84,24 @@ export function Stopwatch() {
         <>
             <div className="text-center">
                 <div className="grid grid-cols-3 gap-3">
-                    <TimeCell value={minutes} label="Minutes" />
-                    <TimeCell value={seconds} label="Seconds" />
-                    <TimeCell value={milliseconds} label="Millis" />
+                    <TimeCell value={minutes} label="Minutes" light={isLightTheme} />
+                    <TimeCell value={seconds} label="Seconds" light={isLightTheme} />
+                    <TimeCell value={milliseconds} label="Millis" light={isLightTheme} />
                 </div>
                 <p className="mt-2 text-sm uppercase tracking-[0.2em] opacity-70">{isRunning ? "Running" : "Stopped"}</p>
             </div>
 
             <div className="flex flex-wrap justify-center gap-3">
-                <button onClick={start} className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-2 text-black">
+                <button onClick={start} className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white px-6 py-2 text-black">
                     <PlayIcon /> Start
                 </button>
-                <button onClick={stop} className="inline-flex items-center gap-2 rounded-full border border-white/20 px-6 py-2">
+                <button onClick={stop} className={`inline-flex items-center gap-2 rounded-full border px-6 py-2 ${isLightTheme ? "border-black/20" : "border-white/20"}`}>
                     <StopIcon /> Stop
                 </button>
-                <button onClick={lap} className="inline-flex items-center gap-2 rounded-full border border-white/20 px-6 py-2">
+                <button onClick={lap} className={`inline-flex items-center gap-2 rounded-full border px-6 py-2 ${isLightTheme ? "border-black/20" : "border-white/20"}`}>
                     <LapIcon /> Lap
                 </button>
-                <button onClick={reset} className="inline-flex items-center gap-2 rounded-full border border-white/20 px-6 py-2">
+                <button onClick={reset} className={`inline-flex items-center gap-2 rounded-full border px-6 py-2 ${isLightTheme ? "border-black/20" : "border-white/20"}`}>
                     <ResetIcon /> Reset
                 </button>
             </div>
@@ -108,7 +111,7 @@ export function Stopwatch() {
     if (isFullscreen) {
         return (
             <section className="mx-auto grid min-h-[calc(100vh-4rem)] w-full max-w-3xl place-items-center">
-                <div className="grid w-full gap-8 rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur md:p-10">
+                <div className={`grid w-full gap-8 rounded-3xl border p-6 backdrop-blur md:p-10 ${isLightTheme ? "border-black/20 bg-white/85" : "border-white/10 bg-white/5"}`}>
                     {activeCard}
                 </div>
             </section>
@@ -116,10 +119,10 @@ export function Stopwatch() {
     }
 
     return (
-        <section className="mx-auto grid w-full max-w-3xl gap-8 rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur md:p-10">
+        <section className={`mx-auto grid w-full max-w-3xl gap-8 rounded-3xl border p-6 backdrop-blur md:p-10 ${isLightTheme ? "border-black/20 bg-white/85" : "border-white/10 bg-white/5"}`}>
             {activeCard}
 
-            <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
+            <div className={`rounded-2xl border p-4 ${isLightTheme ? "border-black/20 bg-white/90" : "border-white/10 bg-black/20"}`}>
                 <div className="mb-2 flex items-center justify-between text-sm opacity-80">
                     <p>{lapsTitle}</p>
                     {fastest !== null && slowest !== null ? (
@@ -130,7 +133,7 @@ export function Stopwatch() {
                 </div>
                 <ul className="max-h-64 space-y-2 overflow-auto pr-2">
                     {laps.map((entry) => (
-                        <li key={entry.id} className="flex items-center justify-between rounded-xl border border-white/10 px-3 py-2">
+                        <li key={entry.id} className={`flex items-center justify-between rounded-xl border px-3 py-2 ${isLightTheme ? "border-black/15" : "border-white/10"}`}>
                             <span className="opacity-70">Lap {entry.id}</span>
                             <span className="font-medium">{formatMs(entry.elapsedMs)}</span>
                         </li>

@@ -1,69 +1,73 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 export interface Lap {
   id: number;
   elapsedMs: number;
 }
 
+let sharedElapsedBeforePauseMs = 0;
+let sharedRunningSinceEpoch: number | null = null;
+let sharedLaps: Lap[] = [];
+
+const computeElapsed = (nowEpoch = Date.now()) => {
+  const live = sharedRunningSinceEpoch ? nowEpoch - sharedRunningSinceEpoch : 0;
+  return sharedElapsedBeforePauseMs + live;
+};
+
 export function useStopwatch() {
-  const [elapsedMs, setElapsedMs] = useState(0);
-  const [isRunning, setIsRunning] = useState(false);
-  const [laps, setLaps] = useState<Lap[]>([]);
-  const startedAtRef = useRef<number | null>(null);
-  const offsetRef = useRef(0);
+  const [elapsedMs, setElapsedMs] = useState(computeElapsed());
+  const [isRunning, setIsRunning] = useState(Boolean(sharedRunningSinceEpoch));
+  const [laps, setLaps] = useState<Lap[]>(sharedLaps);
 
   useEffect(() => {
-    if (!isRunning) {
-      return;
-    }
-
-    let frameId = 0;
-    const loop = () => {
-      if (startedAtRef.current === null) {
-        return;
-      }
-
-      const next = offsetRef.current + (performance.now() - startedAtRef.current);
-      setElapsedMs(next);
-      frameId = requestAnimationFrame(loop);
+    const tick = () => {
+      setElapsedMs(computeElapsed());
+      setIsRunning(Boolean(sharedRunningSinceEpoch));
+      setLaps([...sharedLaps]);
     };
 
-    frameId = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(frameId);
-  }, [isRunning]);
+    tick();
+    const id = window.setInterval(tick, 50);
+    return () => window.clearInterval(id);
+  }, []);
 
   const start = useCallback(() => {
-    if (isRunning) {
+    if (sharedRunningSinceEpoch) {
       return;
     }
 
-    startedAtRef.current = performance.now();
+    sharedRunningSinceEpoch = Date.now();
     setIsRunning(true);
-  }, [isRunning]);
+  }, []);
 
   const stop = useCallback(() => {
-    if (!isRunning || startedAtRef.current === null) {
+    if (!sharedRunningSinceEpoch) {
       return;
     }
 
-    offsetRef.current += performance.now() - startedAtRef.current;
-    startedAtRef.current = null;
+    sharedElapsedBeforePauseMs += Date.now() - sharedRunningSinceEpoch;
+    sharedRunningSinceEpoch = null;
+    setElapsedMs(sharedElapsedBeforePauseMs);
     setIsRunning(false);
-  }, [isRunning]);
+  }, []);
 
   const reset = useCallback(() => {
-    startedAtRef.current = null;
-    offsetRef.current = 0;
+    sharedRunningSinceEpoch = null;
+    sharedElapsedBeforePauseMs = 0;
+    sharedLaps = [];
     setElapsedMs(0);
     setLaps([]);
     setIsRunning(false);
   }, []);
 
   const lap = useCallback(() => {
-    setLaps((current) => [{ id: current.length + 1, elapsedMs }, ...current]);
-  }, [elapsedMs]);
+    const currentElapsed = computeElapsed();
+    sharedLaps = [{ id: sharedLaps.length + 1, elapsedMs: currentElapsed }, ...sharedLaps];
+    setLaps([...sharedLaps]);
+    setElapsedMs(currentElapsed);
+  }, []);
 
   const fastest = useMemo(() => {
     if (!laps.length) {
