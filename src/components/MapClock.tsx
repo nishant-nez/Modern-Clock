@@ -211,7 +211,7 @@ export function MapClock() {
                         className={`pointer-events-none absolute z-20 w-72 rounded-2xl border p-4 shadow-[0_10px_45px_rgba(0,0,0,0.35)] backdrop-blur ${isLightTheme ? "border-slate-300 bg-white/95 text-slate-900" : "border-cyan-300/35 bg-zinc-950/95 text-zinc-100"}`}
                         style={tooltipPosition}
                     >
-                        <p className="text-xs uppercase tracking-[0.22em] opacity-70">Hover Preview</p>
+                        <p className="text-xs uppercase tracking-[0.22em] opacity-70">Preview</p>
                         <h3 className="mt-2 text-xl font-semibold">{hovered.city}</h3>
                         <p className="opacity-70">{hovered.country}</p>
                         <p className="mt-4 text-3xl font-semibold tracking-[0.08em] tabular-nums">{hoverTimeText}</p>

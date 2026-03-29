@@ -7,6 +7,7 @@ import { useSettingsStore } from "@/store/settingsStore";
 
 const MapClock = dynamic(() => import("@/components/MapClock").then((mod) => mod.MapClock), {
     ssr: false,
+    loading: () => <div className="h-130 w-full rounded-3xl border border-white/10 bg-white/5" aria-hidden="true" />,
 });
 
 interface SelectedCity {
