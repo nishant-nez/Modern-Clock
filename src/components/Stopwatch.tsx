@@ -49,7 +49,7 @@ function formatMs(ms: number) {
 function TimeCell({ value, label, light }: { value: string; label: string; light: boolean }) {
     return (
         <div className={`grid place-items-center gap-2 rounded-2xl border px-4 py-4 ${light ? "border-black/20 bg-white" : "border-white/10 bg-black/20"}`}>
-            <p className="text-5xl font-semibold tabular-nums md:text-6xl">{value}</p>
+            <p className="text-4xl font-semibold tabular-nums sm:text-5xl md:text-6xl">{value}</p>
             <p className="text-xs uppercase tracking-[0.18em] opacity-70">{label}</p>
         </div>
     );
@@ -110,8 +110,8 @@ export function Stopwatch() {
 
     if (isFullscreen) {
         return (
-            <section className="mx-auto grid min-h-[calc(100vh-4rem)] w-full max-w-3xl place-items-center">
-                <div className={`grid w-full gap-8 rounded-3xl border p-6 backdrop-blur md:p-10 ${isLightTheme ? "border-black/20 bg-white/85" : "border-white/10 bg-white/5"}`}>
+            <section className="mx-auto grid min-h-[100svh] w-full max-w-3xl place-items-center py-2 sm:py-4">
+                <div className={`grid w-full gap-6 rounded-3xl border p-4 backdrop-blur sm:p-6 md:gap-8 md:p-10 ${isLightTheme ? "border-black/20 bg-white/85" : "border-white/10 bg-white/5"}`}>
                     {activeCard}
                 </div>
             </section>
@@ -119,14 +119,14 @@ export function Stopwatch() {
     }
 
     return (
-        <section className={`mx-auto grid w-full max-w-3xl gap-8 rounded-3xl border p-6 backdrop-blur md:p-10 ${isLightTheme ? "border-black/20 bg-white/85" : "border-white/10 bg-white/5"}`}>
+        <section className={`mx-auto grid w-full max-w-3xl gap-6 rounded-3xl border p-4 backdrop-blur sm:p-6 md:gap-8 md:p-10 ${isLightTheme ? "border-black/20 bg-white/85" : "border-white/10 bg-white/5"}`}>
             {activeCard}
 
             <div className={`rounded-2xl border p-4 ${isLightTheme ? "border-black/20 bg-white/90" : "border-white/10 bg-black/20"}`}>
                 <div className="mb-2 flex items-center justify-between text-sm opacity-80">
                     <p>{lapsTitle}</p>
                     {fastest !== null && slowest !== null ? (
-                        <p>
+                        <p className="text-right text-xs sm:text-sm">
                             Fastest {formatMs(fastest)} · Slowest {formatMs(slowest)}
                         </p>
                     ) : null}

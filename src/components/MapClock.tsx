@@ -145,12 +145,12 @@ export function MapClock() {
         : "";
 
     const tooltipPosition = useMemo(() => {
-        const tooltipWidth = 288;
+        const tooltipWidth = Math.min(288, Math.max(pointer.width - 16, 210));
         const tooltipHeight = 200;
         const margin = 8;
 
         let left = pointer.x + 50;
-        let top = pointer.y + 20;
+        let top = pointer.y + 8;
 
         if (left + tooltipWidth > pointer.width - margin) {
             left = pointer.x - tooltipWidth - 10;
@@ -172,8 +172,8 @@ export function MapClock() {
     }, [pointer]);
 
     return (
-        <section className="grid gap-8 lg:grid-cols-[1.25fr,1fr]">
-            <div className={`relative rounded-3xl border p-4 backdrop-blur md:p-6 ${isLightTheme ? "border-black/20 bg-white/85" : "border-white/10 bg-white/5"}`}>
+        <section className="grid gap-6 sm:gap-8 lg:grid-cols-[1.25fr,1fr]">
+            <div className={`relative rounded-3xl border p-3 backdrop-blur sm:p-4 md:p-6 ${isLightTheme ? "border-black/20 bg-white/85" : "border-white/10 bg-white/5"}`}>
                 <svg
                     viewBox="0 0 1000 520"
                     className={`h-full w-full rounded-2xl p-2 ${isLightTheme ? "bg-slate-100" : "bg-zinc-950/70"}`}
@@ -208,7 +208,7 @@ export function MapClock() {
 
                 {hovered ? (
                     <div
-                        className={`pointer-events-none absolute z-20 w-72 rounded-2xl border p-4 shadow-[0_10px_45px_rgba(0,0,0,0.35)] backdrop-blur ${isLightTheme ? "border-slate-300 bg-white/95 text-slate-900" : "border-cyan-300/35 bg-zinc-950/95 text-zinc-100"}`}
+                        className={`pointer-events-none absolute z-20 w-[min(18rem,calc(100%-1rem))] rounded-2xl border p-3 shadow-[0_10px_45px_rgba(0,0,0,0.35)] backdrop-blur sm:p-4 ${isLightTheme ? "border-slate-300 bg-white/95 text-slate-900" : "border-cyan-300/35 bg-zinc-950/95 text-zinc-100"}`}
                         style={tooltipPosition}
                     >
                         <p className="text-xs uppercase tracking-[0.22em] opacity-70">Preview</p>
@@ -222,11 +222,11 @@ export function MapClock() {
                 ) : null}
             </div>
 
-            <aside className={`rounded-3xl border p-6 backdrop-blur ${isLightTheme ? "border-black/20 bg-white/85" : "border-white/10 bg-white/5"}`}>
+            <aside className={`rounded-3xl border p-4 backdrop-blur sm:p-6 ${isLightTheme ? "border-black/20 bg-white/85" : "border-white/10 bg-white/5"}`}>
                 <p className="text-xs uppercase tracking-[0.22em] opacity-70">Selected Location</p>
                 <h3 className="mt-3 text-2xl font-semibold">{selected.city}</h3>
                 <p className="opacity-70">{selected.country}</p>
-                <p className="mt-8 text-5xl font-semibold tracking-[0.08em] tabular-nums">{timeText}</p>
+                <p className="mt-6 text-4xl font-semibold tracking-[0.08em] tabular-nums sm:mt-8 sm:text-5xl">{timeText}</p>
                 <p className="mt-3 opacity-80">{dateText}</p>
                 <p className="mt-2 opacity-70">{selected.timeZone}</p>
                 <p className="opacity-70">{getUtcOffsetLabel(selected.timeZone)}</p>

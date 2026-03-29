@@ -59,12 +59,12 @@ export function DigitalClock() {
                 : "font-semibold";
 
     return (
-        <section className="flex flex-col items-center gap-6 text-center">
+        <section className="flex flex-col items-center gap-3 sm:gap-5 md:gap-6 text-center">
             <div
-                className={`clock-display select-none text-[clamp(3rem,18vw,13rem)] leading-none ${clockClassName}`}
+                className={`clock-display select-none text-[clamp(2.5rem,14vw,10rem)] leading-none ${clockClassName}`}
                 aria-live="polite"
             >
-                <span className="inline-flex items-center gap-3 md:gap-5">
+                <span className="inline-flex items-center gap-2 sm:gap-3 md:gap-5">
                     <TimeGroup value={hourText} split={split} />
                     <span className="colon-blink">:</span>
                     <TimeGroup value={minuteText} split={split} />
@@ -83,7 +83,7 @@ export function DigitalClock() {
             </div>
 
             {showDate ? (
-                <p className="text-sm tracking-[0.18em] uppercase opacity-75 md:text-base">{dateText}</p>
+                <p className="text-xs sm:text-sm tracking-[0.18em] uppercase opacity-75 md:text-base">{dateText}</p>
             ) : null}
         </section>
     );

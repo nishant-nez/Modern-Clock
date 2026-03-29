@@ -62,18 +62,18 @@ function CityCard({ city, onRemove }: { city: SelectedCity; onRemove: () => void
         .find((part) => part.type === "timeZoneName")?.value;
 
     return (
-        <li className={`rounded-2xl border p-4 ${isLightTheme ? "border-black/20 bg-white/85" : "border-white/10 bg-white/5"}`}>
+        <li className={`rounded-2xl border p-4 sm:p-5 ${isLightTheme ? "border-black/20 bg-white/85" : "border-white/10 bg-white/5"}`}>
             <div className="flex items-start justify-between">
                 <div>
-                    <h3 className="text-xl font-medium">{city.city}</h3>
+                    <h3 className="text-lg font-medium sm:text-xl">{city.city}</h3>
                     <p className="opacity-70">{city.country}</p>
                     <p className="mt-1 text-xs opacity-60">{city.timeZone}</p>
                 </div>
-                <button onClick={onRemove} className={`inline-flex items-center gap-1 rounded-lg border px-2 py-1 text-xs ${isLightTheme ? "border-black/20" : "border-white/20"}`}>
+                <button onClick={onRemove} className={`inline-flex items-center gap-1 rounded-lg border px-2 py-1 text-xs whitespace-nowrap ${isLightTheme ? "border-black/20" : "border-white/20"}`}>
                     <RemoveIcon /> Remove
                 </button>
             </div>
-            <p className="mt-4 text-4xl font-semibold tracking-[0.06em] tabular-nums">{timeText}</p>
+            <p className="mt-4 text-3xl font-semibold tracking-[0.06em] tabular-nums sm:text-4xl">{timeText}</p>
             <p className="mt-1 text-sm opacity-70">{offset}</p>
         </li>
     );
@@ -103,8 +103,8 @@ export function WorldClockPanel() {
     };
 
     return (
-        <section className="grid gap-8">
-            <div className={`rounded-3xl border p-5 backdrop-blur ${isLightTheme ? "border-black/20 bg-white/85" : "border-white/10 bg-white/5"}`}>
+        <section className="grid gap-6 sm:gap-8">
+            <div className={`rounded-3xl border p-4 backdrop-blur sm:p-5 ${isLightTheme ? "border-black/20 bg-white/85" : "border-white/10 bg-white/5"}`}>
                 <div className="grid gap-3">
                     <input
                         value={query}
@@ -141,7 +141,7 @@ export function WorldClockPanel() {
                 </div>
             </div>
 
-            <ul className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            <ul className="grid gap-4 sm:gap-5 md:grid-cols-2 xl:grid-cols-3">
                 {cities.map((city) => (
                     <CityCard
                         key={city.id}

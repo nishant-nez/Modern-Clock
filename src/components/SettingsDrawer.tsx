@@ -43,7 +43,7 @@ export function SettingsDrawer({ open, onClose }: SettingsDrawerProps) {
                     </button>
                 </div>
 
-                <div className="space-y-5 overflow-y-auto pb-8">
+                <div className="space-y-5 overflow-y-auto pb-8 max-h-[calc(100vh-5rem)]">
                     <section className="space-y-2">
                         <label className="text-xs uppercase tracking-[0.2em] opacity-70">Theme</label>
                         <div className="grid grid-cols-2 gap-2">

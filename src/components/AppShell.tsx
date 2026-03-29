@@ -79,10 +79,35 @@ function SettingsIcon() {
     );
 }
 
+function MenuIcon({ open }: { open: boolean }) {
+    if (open) {
+        return (
+            <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" aria-hidden="true">
+                <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            </svg>
+        );
+    }
+
+    return (
+        <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" aria-hidden="true">
+            <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+        </svg>
+    );
+}
+
+function ExitFullscreenIcon() {
+    return (
+        <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" aria-hidden="true">
+            <path d="M8 8l8 8M16 8l-8 8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+        </svg>
+    );
+}
+
 export function AppShell({ children }: AppShellProps) {
     const router = useRouter();
     const pathname = usePathname();
     const [open, setOpen] = useState(false);
+    const [mobileNavOpen, setMobileNavOpen] = useState(false);
     const [isFullscreen, setIsFullscreen] = useState(false);
     const theme = useSettingsStore((state) => state.theme);
     const autoNightMode = useSettingsStore((state) => state.autoNightMode);
@@ -157,7 +182,7 @@ export function AppShell({ children }: AppShellProps) {
             <div className="app-theme min-h-screen">
                 {!isFullscreen ? (
                     <header className={`fixed left-0 right-0 top-0 z-20 border-b backdrop-blur ${isLightTheme ? "border-black/20 bg-white/85" : "border-white/10 bg-black/25"}`}>
-                        <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-4 py-3 md:px-6">
+                        <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-3 px-3 py-3 sm:px-4 md:px-6">
                             <Link href="/clock" className="text-sm font-semibold tracking-[0.2em] uppercase">
                                 Clock App
                             </Link>
@@ -178,7 +203,16 @@ export function AppShell({ children }: AppShellProps) {
                             </nav>
 
                             <div className="flex items-center gap-2">
-                                <div className={`flex items-center rounded-full border p-1 ${isLightTheme ? "border-black/15 bg-white/85" : "border-white/20 bg-black/25"}`}>
+                                <button
+                                    onClick={() => setMobileNavOpen((current) => !current)}
+                                    title={mobileNavOpen ? "Close menu" : "Open menu"}
+                                    aria-label={mobileNavOpen ? "Close menu" : "Open menu"}
+                                    className={`rounded-full border p-2.5 md:hidden ${isLightTheme ? "border-black/15 hover:bg-slate-200" : "border-white/20 hover:bg-white/10"}`}
+                                >
+                                    <MenuIcon open={mobileNavOpen} />
+                                </button>
+
+                                <div className={`hidden items-center rounded-full border p-1 md:flex ${isLightTheme ? "border-black/15 bg-white/85" : "border-white/20 bg-black/25"}`}>
                                     <button
                                         onClick={() => setTimeFormat("12h")}
                                         title="Use 12-hour format"
@@ -212,11 +246,21 @@ export function AppShell({ children }: AppShellProps) {
                                         <TimeFormatIcon />
                                     </button>
                                 </div>
+
+                                <button
+                                    onClick={onToggleTimeFormat}
+                                    title="Toggle time format"
+                                    aria-label="Toggle time format"
+                                    className={`rounded-full border p-2.5 md:hidden ${isLightTheme ? "border-black/15 hover:bg-slate-200" : "border-white/15 hover:bg-white/10"}`}
+                                >
+                                    <TimeFormatIcon />
+                                </button>
+
                                 <button
                                     onClick={onToggleTheme}
                                     title={`Switch theme (current: ${theme})`}
                                     aria-label={`Switch theme (current: ${theme})`}
-                                    className={`inline-flex items-center gap-2 rounded-full border px-3 py-2 text-xs uppercase tracking-[0.12em] ${isLightTheme ? "border-black/15 hover:bg-slate-200" : "border-white/20 hover:bg-white/10"}`}
+                                    className={`hidden items-center gap-2 rounded-full border px-2.5 py-2 text-xs uppercase tracking-[0.12em] md:inline-flex md:px-3 ${isLightTheme ? "border-black/15 hover:bg-slate-200" : "border-white/20 hover:bg-white/10"}`}
                                 >
                                     <ThemeIcon theme={theme} />
                                     <span className="hidden lg:inline">{theme}</span>
@@ -239,13 +283,46 @@ export function AppShell({ children }: AppShellProps) {
                                 </button>
                             </div>
                         </div>
+
+                        {mobileNavOpen ? (
+                            <div className={`mx-3 mb-3 grid gap-2 rounded-2xl border p-2 sm:mx-4 md:hidden ${isLightTheme ? "border-black/15 bg-white/92" : "border-white/10 bg-black/45"}`}>
+                                {NAV_ITEMS.map((item) => {
+                                    const active = pathname === item.href;
+                                    return (
+                                        <Link
+                                            key={item.href}
+                                            href={item.href}
+                                            onClick={() => setMobileNavOpen(false)}
+                                            className={`rounded-xl px-3 py-2 text-sm transition ${active
+                                                ? "bg-white text-black"
+                                                : isLightTheme
+                                                    ? "bg-slate-100 text-slate-800"
+                                                    : "bg-white/5 hover:bg-white/15"}`}
+                                        >
+                                            {item.label}
+                                        </Link>
+                                    );
+                                })}
+                            </div>
+                        ) : null}
                     </header>
                 ) : null}
 
-                <main className={`mx-auto flex min-h-screen w-full max-w-7xl flex-1 flex-col px-4 pb-12 md:px-6 ${isFullscreen ? "pt-6" : "pt-28"}`}>
-                    {!isFullscreen ? <div className="mb-8 text-xs uppercase tracking-[0.2em] opacity-70">{pageTitle}</div> : null}
+                <main className={`mx-auto flex min-h-[100svh] w-full max-w-7xl flex-1 flex-col px-3 pb-14 sm:px-4 md:px-6 ${isFullscreen ? "pt-4" : mobileNavOpen ? "pt-48" : "pt-20 md:pt-28"}`}>
+                    {!isFullscreen ? <div className="mb-6 text-xs uppercase tracking-[0.2em] opacity-70 md:mb-8">{pageTitle}</div> : null}
                     {children}
                 </main>
+
+                {isFullscreen ? (
+                    <button
+                        onClick={onFullscreen}
+                        aria-label="Exit fullscreen"
+                        title="Exit fullscreen"
+                        className={`fullscreen-exit-fab fixed bottom-6 left-1/2 -translate-x-1/2 z-50 grid h-14 w-14 cursor-pointer place-items-center rounded-full border backdrop-blur ${isLightTheme ? "border-black/20 bg-white/55 text-slate-800" : "border-white/25 bg-black/35 text-white"}`}
+                    >
+                        <ExitFullscreenIcon />
+                    </button>
+                ) : null}
             </div>
             <SettingsDrawer open={open} onClose={() => setOpen(false)} />
         </>

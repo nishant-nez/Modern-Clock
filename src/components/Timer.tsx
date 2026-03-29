@@ -33,7 +33,7 @@ function ResetIcon() {
 function TimeDisplay({ label, value, light }: { label: string; value: string; light: boolean }) {
     return (
         <div className={`grid place-items-center gap-2 rounded-2xl border px-3 py-4 ${light ? "border-black/20 bg-white" : "border-white/10 bg-black/25"}`}>
-            <span className="text-5xl font-semibold tabular-nums md:text-6xl">{value}</span>
+            <span className="text-4xl font-semibold tabular-nums sm:text-5xl md:text-6xl">{value}</span>
             <span className="text-xs uppercase tracking-[0.2em] opacity-70">{label}</span>
         </div>
     );
@@ -148,7 +148,10 @@ export function Timer() {
                 } ${isFullscreen ? "md:grid-cols-[340px,1fr]" : "md:grid-cols-[250px,1fr]"}`}
         >
             <div className="relative grid place-items-center">
-                <svg className={`${isFullscreen ? "h-80 w-80" : "h-52 w-52"} -rotate-90`} viewBox="0 0 180 180">
+                <svg
+                    className={`${isFullscreen ? "h-[min(42svh,20rem)] w-[min(42svh,20rem)]" : "h-48 w-48 sm:h-52 sm:w-52"} -rotate-90`}
+                    viewBox="0 0 180 180"
+                >
                     <circle
                         cx="90"
                         cy="90"
@@ -170,14 +173,14 @@ export function Timer() {
                     />
                 </svg>
                 <div className="pointer-events-none absolute inset-0 grid place-items-center text-center">
-                    <p className={`${isFullscreen ? "text-5xl" : "text-3xl"} font-semibold tabular-nums`}>{progressPercent}%</p>
+                    <p className={`${isFullscreen ? "text-4xl sm:text-5xl" : "text-3xl"} font-semibold tabular-nums`}>{progressPercent}%</p>
                     <p className="text-xs uppercase tracking-[0.16em] opacity-70">{isRunning ? "Running" : "Paused"}</p>
                 </div>
             </div>
 
             <div className="grid content-center gap-4">
                 <h2 className="text-sm uppercase tracking-[0.2em] opacity-70">Active countdown</h2>
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-3 gap-2 sm:gap-3">
                     <TimeDisplay label="Hours" value={remainHours} light={isLightTheme} />
                     <TimeDisplay label="Minutes" value={remainMinutes} light={isLightTheme} />
                     <TimeDisplay label="Seconds" value={remainSeconds} light={isLightTheme} />
@@ -221,7 +224,7 @@ export function Timer() {
 
     if (isFullscreen) {
         return (
-            <section className="mx-auto grid min-h-[calc(100vh-4rem)] w-full max-w-6xl place-items-center">
+            <section className="mx-auto grid min-h-[100svh] w-full max-w-6xl place-items-center py-2 sm:py-4">
                 {activeCard}
             </section>
         );
@@ -229,7 +232,7 @@ export function Timer() {
 
     return (
         <section
-            className={`mx-auto grid w-full max-w-4xl gap-6 rounded-3xl border p-6 backdrop-blur md:p-10 ${isLightTheme ? "border-black/20 bg-white/85" : "border-white/10 bg-white/5"
+            className={`mx-auto grid w-full max-w-4xl gap-6 rounded-3xl border p-4 backdrop-blur sm:p-6 md:p-10 ${isLightTheme ? "border-black/20 bg-white/85" : "border-white/10 bg-white/5"
                 }`}
         >
             {activeCard}
